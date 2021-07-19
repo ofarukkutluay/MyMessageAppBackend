@@ -11,8 +11,8 @@ namespace Entities.Concretes
 {
     public class Message:EntityBase, IEntity
     {
-        public User SenderUser { get; set; }
-        public User ReciverUser { get; set; }
+        public string SenderUserId { get; set; }
+        public string ReciverUserId { get; set; }
         public string Text { get; set; }
         public DateTime? SendTime { get; set; }
         public DateTime? ReadTime { get; set; }

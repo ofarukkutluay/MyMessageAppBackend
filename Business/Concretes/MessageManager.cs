@@ -21,27 +21,33 @@ namespace Business.Concretes
 
         public IDataResult<List<Message>> GetAll()
         {
-            throw new NotImplementedException();
+            var result = _messageRepository.GetAll();
+            return new SuccessDataResult<List<Message>>(result);
         }
 
         public IResult Add(Message entity)
         {
-            throw new NotImplementedException();
+            entity.SendTime = DateTime.Now;
+            _messageRepository.Insert(entity);
+            return new SuccessResult();
         }
 
-        public IDataResult<Message> GetById(long id)
+        public IDataResult<Message> GetById(string id)
         {
-            throw new NotImplementedException();
+            var result = _messageRepository.GetById(id);
+            return new SuccessDataResult<Message>(result);
         }
 
         public IResult Update(Message entity)
         {
-            throw new NotImplementedException();
+            _messageRepository.Update(entity);
+            return new SuccessResult();
         }
 
         public IResult Delete(Message entity)
         {
-            throw new NotImplementedException();
+            _messageRepository.Delete(entity);
+            return new SuccessResult();
         }
     }
 }

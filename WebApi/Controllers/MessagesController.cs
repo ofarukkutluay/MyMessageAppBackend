@@ -4,67 +4,69 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Business.Abstracts;
-using Core.Entities.Concretes;
 using Core.WebApi;
+using Entities.Concretes;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class UsersController : Controller, IBaseApiCrudControllerRepository<User>
+    public class MessagesController : Controller, IBaseApiCrudControllerRepository<Message>
     {
-        private IUserService _userService;
 
-        public UsersController(IUserService userService)
+        private IMessageService _messageService;
+
+        public MessagesController(IMessageService messageService)
         {
-            _userService = userService;
+            _messageService = messageService;
         }
 
         [HttpPost]
-        public IActionResult Add(User user)
+        public IActionResult Add(Message entity)
         {
-            var result = _userService.Add(user);
+            var result = _messageService.Add(entity);
             if (result.Success)
             {
                 return Ok(result);
             }
+
             return BadRequest(result);
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            var result = _userService.GetAll();
+            var result = _messageService.GetAll();
             if (result.Success)
             {
                 return Ok(result);
-
             }
 
             return BadRequest(result);
         }
 
         [HttpPost]
-        public IActionResult Delete(User user)
+        public IActionResult Delete(Message entity)
         {
-            var result = _userService.Delete(user);
+            var result = _messageService.Delete(entity);
             if (result.Success)
             {
                 return Ok(result);
             }
+
             return BadRequest(result);
         }
 
         [HttpPost]
-        public IActionResult Update(User user)
+        public IActionResult Update(Message entity)
         {
-            var result = _userService.Update(user);
+            var result = _messageService.Update(entity);
             if (result.Success)
             {
                 return Ok(result);
             }
+
             return BadRequest(result);
         }
-
     }
 }

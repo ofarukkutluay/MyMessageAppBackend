@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Business.Abstracts;
 using Business.Constants;
+using Business.ValidationRules.FluentValidation;
 using Core.Entities.Concretes;
 using Core.Utilities.Results;
 using DataAccess.Abstracts;
+using FluentValidation;
 
 namespace Business.Concretes
 {
@@ -23,28 +25,32 @@ namespace Business.Concretes
         public IDataResult<List<User>> GetAll()
         {
             List<User> result = _userRepository.GetAll().ToList();
-            return new SuccessDataResult<List<User>>(result,Messages.GetAll);
+            return new SuccessDataResult<List<User>>(result, Messages.GetAll);
         }
 
+        
         public IResult Add(User entity)
         {
-            
-
-            if (entity.Email.Contains("@"))
+            var resultValidate = new UserValidator().Validate(entity);
+            if (resultValidate.IsValid)
             {
-                entity.CreateTime=DateTime.Now;
-                entity.Status = false;
-                _userRepository.Insert(entity);
-                return new SuccessResult(Messages.Add(entity.Email));
+                if (_userRepository.SearchFor(e => e.Email == entity.Email) == null)
+                {
+                    entity.CreateTime = DateTime.Now;
+                    entity.Status = false;
+                    _userRepository.Insert(entity);
+                    return new SuccessResult(Messages.Add(entity.Email));
+                }
+                return new ErrorResult("Aynı emailde kayıt bulunmaktadır.");
             }
 
-            return new ErrorResult("Kayıt oluşturulamadı.");
+            return new ErrorResult(resultValidate.ToString("~"));
 
         }
 
-        public IDataResult<User> GetById(long id)
+        public IDataResult<User> GetById(string id)
         {
-            var result = _userRepository.GetById(id.ToString());
+            var result = _userRepository.GetById(id);
             return new SuccessDataResult<User>(result, Messages.GetById(result.Email));
         }
 

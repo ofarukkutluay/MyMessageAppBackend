@@ -11,7 +11,7 @@ namespace Core.Business
     {
         IDataResult<List<T>> GetAll();
         IResult Add(T entity);
-        IDataResult<T> GetById(long id);
+        IDataResult<T> GetById(string id);
         IResult Update(T entity);
         IResult Delete(T entity);
     }
