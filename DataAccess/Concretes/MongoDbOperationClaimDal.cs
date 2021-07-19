@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.DataAccess.MongoDb;
+using Core.Entities.Concretes;
 using DataAccess.Abstracts;
-using Entities.Concretes;
+using MongoDB.Driver;
 
 namespace DataAccess.Concretes
 {
-    public class MessageDal:MongoDbRepositoryBase<Message>,IMessageRepository
+    public class MongoDbOperationClaimDal : MongoDbRepositoryBase<OperationClaim>,IOperationClaimRepository
     {
     }
 }

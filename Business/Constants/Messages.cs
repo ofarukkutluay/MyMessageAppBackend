@@ -17,6 +17,13 @@ namespace Business.Constants
         public static string GetById(string entityName) => entityName + " getirildi";
         public static string Update(string entityName) => entityName + " güncellendi";
         public static string Delete(string entityName) => entityName + " silindi";
+        public static string AuthorizationDenied = "Yetkiniz yok";
+        public static string UserRegistered = "Kayıt edildi";
+        public static string UserNotFound = "Kullanıcı bulunamadı";
+        public static string PasswordError = "Şifre hatalı";
+        public static string SuccessfulLogin = "Giriş başarılı";
+        public static string UserAlreadyExists = "Kullanıcı Mevcut";
+        public static string AccessTokenCreated = "Geçerli Token oluşturuldu";
 
     }
 }

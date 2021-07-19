@@ -9,6 +9,7 @@ using Business.ValidationRules.FluentValidation;
 using Core.Entities.Concretes;
 using Core.Utilities.Results;
 using DataAccess.Abstracts;
+using DataAccess.Concretes;
 using FluentValidation;
 
 namespace Business.Concretes
@@ -28,20 +29,16 @@ namespace Business.Concretes
             return new SuccessDataResult<List<User>>(result, Messages.GetAll);
         }
 
-        
+
         public IResult Add(User entity)
         {
             var resultValidate = new UserValidator().Validate(entity);
-            if (resultValidate.IsValid)
+            if (resultValidate.IsValid && GetByMail(entity.Email) == null)
             {
-                if (_userRepository.SearchFor(e => e.Email == entity.Email) == null)
-                {
-                    entity.CreateTime = DateTime.Now;
-                    entity.Status = false;
-                    _userRepository.Insert(entity);
-                    return new SuccessResult(Messages.Add(entity.Email));
-                }
-                return new ErrorResult("Aynı emailde kayıt bulunmaktadır.");
+                entity.CreateTime = DateTime.Now;
+                entity.Status = false;
+                _userRepository.Insert(entity);
+                return new SuccessResult(Messages.Add(entity.Email));
             }
 
             return new ErrorResult(resultValidate.ToString("~"));
@@ -74,6 +71,27 @@ namespace Business.Concretes
             }
 
             return new ErrorResult("Kullanıcıyı silmek için id gereklidir");
+        }
+
+        public List<OperationClaim> GetClaims(User user)
+        {
+            MongoDbUserOperationClaimDal userOperationClaimDal = new MongoDbUserOperationClaimDal();
+            MongoDbOperationClaimDal operationClaimDal = new MongoDbOperationClaimDal();
+            List<UserOperationClaim> userOperationClaims = userOperationClaimDal.SearchFor(uoc => uoc.UserId == user.Id);
+            List<OperationClaim> operationClaims = new List<OperationClaim>();
+            foreach (var uoc in userOperationClaims)
+            {
+                operationClaims.AddRange(operationClaimDal.SearchFor(oc => oc.Id == uoc.OperationClaimId).ToList());
+            }
+
+            return operationClaims;
+
+        }
+
+        public User GetByMail(string email)
+        {
+            var result = _userRepository.SearchFor(e => e.Email == email).FirstOrDefault();
+            return result;
         }
     }
 }

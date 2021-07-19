@@ -11,7 +11,7 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class MessagesController : Controller, IBaseApiCrudControllerRepository<Message>
+    public class MessagesController : Controller
     {
 
         private IMessageService _messageService;

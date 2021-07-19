@@ -11,7 +11,7 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class UsersController : Controller, IBaseApiCrudControllerRepository<User>
+    public class UsersController : Controller
     {
         private IUserService _userService;
 
@@ -20,7 +20,7 @@ namespace WebApi.Controllers
             _userService = userService;
         }
 
-        [HttpPost]
+        /*[HttpPost]
         public IActionResult Add(User user)
         {
             var result = _userService.Add(user);
@@ -29,7 +29,7 @@ namespace WebApi.Controllers
                 return Ok(result);
             }
             return BadRequest(result);
-        }
+        }*/
 
         [HttpGet]
         public IActionResult GetAll()

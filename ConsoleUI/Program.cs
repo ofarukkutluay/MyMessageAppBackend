@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Business.Abstracts;
@@ -13,9 +15,24 @@ namespace ConsoleUI
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
-            var user = new User()
+            MongoDbUserOperationClaimDal userOperationClaimDal = new MongoDbUserOperationClaimDal();
+            MongoDbOperationClaimDal operationClaimDal = new MongoDbOperationClaimDal();
+            List<UserOperationClaim> userOperationClaims = userOperationClaimDal.SearchFor(uoc => uoc.UserId == "60f4785aaa53c514c6754d9c");
+            List<OperationClaim> operationClaims = new List<OperationClaim>();
+            foreach (var uoc in userOperationClaims)
+            {
+                Console.WriteLine("{0} operationclaimid {1} userId", uoc.OperationClaimId,uoc.UserId);
+                operationClaims.AddRange(operationClaimDal.SearchFor(oc => oc.Id == uoc.OperationClaimId).ToList());
+            }
+
+            foreach (var oc in operationClaims)
+            {
+                 Console.WriteLine("{0} operationclaimid {1} name", oc.Id, oc.Name);
+            }
+
+            /* var user = new User()
             {
                FirstName = "Test",
                LastName = "Test",
@@ -34,13 +51,13 @@ namespace ConsoleUI
             {
                 Console.WriteLine(field.Name);
                 Console.WriteLine(field.GetValue(user));
-            }
+            } */
 
 
             //var data = Connect().GetCollection<BsonDocument>("Users").Find(new BsonDocument()).FirstOrDefault();
             //Console.WriteLine(data.ToString());
 
-            
+
 
             //var data2 = Connect().GetCollection<BsonDocument>("Users").InsertOneAsync(user.ToBsonDocument());
             //Console.WriteLine(data2);
