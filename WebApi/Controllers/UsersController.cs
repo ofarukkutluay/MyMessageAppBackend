@@ -44,7 +44,7 @@ namespace WebApi.Controllers
             return BadRequest(result);
         }
 
-        [HttpPost]
+        [HttpDelete]
         public IActionResult Delete(User user)
         {
             var result = _userService.Delete(user);
@@ -55,7 +55,7 @@ namespace WebApi.Controllers
             return BadRequest(result);
         }
 
-        [HttpPost]
+        [HttpPut]
         public IActionResult Update(User user)
         {
             var result = _userService.Update(user);

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Entities.MongoDb;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
@@ -89,6 +90,8 @@ namespace Core.DataAccess.MongoDb
                      .Get("MongoDbConnectionString")
                          .Replace("{DB_NAME}", GetDatabaseName()); */
             string connectionUrl = "mongodb+srv://drCmd:gyuayhd3hhDfIeUA@mymessageappdb.dw6rz.mongodb.net/{DB_NAME}?retryWrites=true&w=majority";
+            
+            //string connectionUrl = Configuration.GetSection("AppSettings:MongoDbConnectionString").ToString();
             connectionUrl.Replace("{DB_NAME}", GetDatabaseName());
             return connectionUrl;
 
@@ -99,6 +102,8 @@ namespace Core.DataAccess.MongoDb
                  .AppSettings
                      .Get("MongoDbDatabaseName"); */
             return "MyMessage";
+
+            //return Configuration.GetSection("AppSettings:MongoDbDatabaseString").ToString();
         }
         private void GetCollection()
         {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Business.Abstracts;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Validation;
 using Core.Entities.Concretes;
 using Core.Utilities.Results;
 using DataAccess.Abstracts;
@@ -30,10 +31,11 @@ namespace Business.Concretes
         }
 
 
+        [ValidationAspect(typeof(UserValidator))]
         public IResult Add(User entity)
         {
-            var resultValidate = new UserValidator().Validate(entity);
-            if (resultValidate.IsValid && GetByMail(entity.Email) == null)
+            
+            if ( GetByMail(entity.Email) == null)
             {
                 entity.CreateTime = DateTime.Now;
                 entity.Status = false;
@@ -41,7 +43,7 @@ namespace Business.Concretes
                 return new SuccessResult(Messages.Add(entity.Email));
             }
 
-            return new ErrorResult(resultValidate.ToString("~"));
+            return new ErrorResult();
 
         }
 
@@ -51,6 +53,7 @@ namespace Business.Concretes
             return new SuccessDataResult<User>(result, Messages.GetById(result.Email));
         }
 
+        [ValidationAspect(typeof(UserValidator))]
         public IResult Update(User entity)
         {
             if (entity.Id != null)

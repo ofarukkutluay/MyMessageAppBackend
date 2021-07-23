@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Business.Abstracts;
+using Business.BusinessAspects.Autofac;
 using Core.Utilities.Results;
 using DataAccess.Abstracts;
 using Entities.Concretes;
@@ -19,6 +20,7 @@ namespace Business.Concretes
             _messageRepository = messageRepository;
         }
 
+        [SecuredOperation("admin")]
         public IDataResult<List<Message>> GetAll()
         {
             var result = _messageRepository.GetAll();
@@ -32,12 +34,14 @@ namespace Business.Concretes
             return new SuccessResult();
         }
 
+        [SecuredOperation("admin")]
         public IDataResult<Message> GetById(string id)
         {
             var result = _messageRepository.GetById(id);
             return new SuccessDataResult<Message>(result);
         }
 
+        [SecuredOperation("admin")]
         public IResult Update(Message entity)
         {
             _messageRepository.Update(entity);

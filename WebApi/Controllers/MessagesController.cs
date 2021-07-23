@@ -45,7 +45,7 @@ namespace WebApi.Controllers
             return BadRequest(result);
         }
 
-        [HttpPost]
+        [HttpDelete]
         public IActionResult Delete(Message entity)
         {
             var result = _messageService.Delete(entity);
@@ -57,7 +57,7 @@ namespace WebApi.Controllers
             return BadRequest(result);
         }
 
-        [HttpPost]
+        [HttpPut]
         public IActionResult Update(Message entity)
         {
             var result = _messageService.Update(entity);
