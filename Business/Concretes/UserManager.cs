@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Business.Abstracts;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
+using Core.Aspects.Autofac.Caching;
+using Core.Aspects.Autofac.Performance;
+using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.Entities.Concretes;
 using Core.Utilities.Results;
@@ -23,14 +26,16 @@ namespace Business.Concretes
         {
             _userRepository = userRepository;
         }
-
+        
+        [CacheAspect]
+        [PerformanceAspect(1)]
         public IDataResult<List<User>> GetAll()
         {
             List<User> result = _userRepository.GetAll().ToList();
             return new SuccessDataResult<List<User>>(result, Messages.GetAll);
         }
 
-
+        
         [ValidationAspect(typeof(UserValidator))]
         public IResult Add(User entity)
         {
@@ -47,19 +52,21 @@ namespace Business.Concretes
 
         }
 
+        [TransactionScopeAspect]
         public IDataResult<User> GetById(string id)
         {
             var result = _userRepository.GetById(id);
             return new SuccessDataResult<User>(result, Messages.GetById(result.Email));
         }
 
+        [CacheRemoveAspect("IUserService.Get")]
         [ValidationAspect(typeof(UserValidator))]
         public IResult Update(User entity)
         {
             if (entity.Id != null)
             {
                 _userRepository.Update(entity);
-                return new SuccessResult(Messages.Update(entity.Email));
+                return new SuccessResult(Messages.Update(entity.Id));
             }
 
             return new ErrorResult("Güncelleme için id gereklidir!");

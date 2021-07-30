@@ -23,18 +23,26 @@ namespace WebApi
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProviderFactory()).ConfigureContainer<ContainerBuilder>(builder =>
+            Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new AutofacServiceProviderFactory())
+                .ConfigureContainer<ContainerBuilder>(builder =>
                 {
                     builder.RegisterModule(new AutofacBusinessModule());
                 }).ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>(); 
+
                 });
     }
 }
-/*.UseServiceProviderFactory(new DryIocServiceProviderFactory())
+        /*DryIoc için
+         
+        private static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new DryIocServiceProviderFactory())
                 .ConfigureContainer<IContainer>(
                     (hostBuilderContext ,container) =>
                     {
                         DryIocBusinessModule.Register(container);
-                    })*/
+                    }).ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });*/

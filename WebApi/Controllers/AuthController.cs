@@ -55,5 +55,22 @@ namespace WebApi.Controllers
 
             return BadRequest(result.Message);
         }
+
+        [HttpPut]
+        public ActionResult PasswordUpdate(UserForPasswordUpdateDto userForPasswordUpdateDto)
+        {
+            var updateResult = _authService.PasswordUpdate(userForPasswordUpdateDto, userForPasswordUpdateDto.NewPassword);
+            if (!updateResult.Success)
+            {
+                return BadRequest(updateResult.Message);
+            }
+            var result = _authService.CreateAccessToken(updateResult.Data);
+            if (result.Success)
+            {
+                return Ok(result.Data);
+            }
+
+            return BadRequest(result.Message);
+        }
     }
 }

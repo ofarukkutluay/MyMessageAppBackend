@@ -14,7 +14,6 @@ namespace Business.ValidationRules.FluentValidation
         {
             RuleFor(u => u.Email).EmailAddress().WithMessage("Mail adresi geçerli değil!");
             RuleFor(u => u.FirstName).MinimumLength(2).WithMessage("İsim en az {PropertyValue} kadar olabilir");
-            RuleFor(u => u.Status).NotNull();
 
         }
     }

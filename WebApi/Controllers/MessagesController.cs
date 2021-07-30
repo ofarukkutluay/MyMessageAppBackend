@@ -45,6 +45,18 @@ namespace WebApi.Controllers
             return BadRequest(result);
         }
 
+        [HttpGet]
+        public IActionResult GetBySenderAndReciverAll(string senderId, string reciverId)
+        {
+            var result = _messageService.GetBySenderAndReciverAll(senderId, reciverId);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result);
+        }
+
         [HttpDelete]
         public IActionResult Delete(Message entity)
         {

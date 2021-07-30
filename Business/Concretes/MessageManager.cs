@@ -53,5 +53,12 @@ namespace Business.Concretes
             _messageRepository.Delete(entity);
             return new SuccessResult();
         }
+
+        public IDataResult<List<Message>> GetBySenderAndReciverAll(string senderId, string reciverId)
+        {
+            var result = _messageRepository.SearchFor(m => m.SenderUserId == senderId && m.ReciverUserId == reciverId)
+                .OrderByDescending(m => m.SendTime).ToList();
+            return new SuccessDataResult<List<Message>>(result,"Mesajlar tarih sıralamasına göre listelendi");
+        }
     }
 }

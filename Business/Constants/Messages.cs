@@ -24,6 +24,7 @@ namespace Business.Constants
         public static string SuccessfulLogin = "Giriş başarılı";
         public static string UserAlreadyExists = "Kullanıcı Mevcut";
         public static string AccessTokenCreated = "Geçerli Token oluşturuldu";
-
+        public static string PasswordChanged = "Şifre Değiştirildi";
+        public static string AccessTokenDontCreated = "Geçerli Token oluşturulamadı";
     }
 }
