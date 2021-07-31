@@ -12,9 +12,16 @@ namespace Core.Entities.Concretes
 {
     public class User : EntityBase, IEntity
     {
+        public User()
+        {
+            CreateTime = DateTime.Now;
+            Status = false;
+        }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+        public long NationaltyId { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public bool Status { get; set; }
         public DateTime? CreateTime { get; set; }
         public DateTime? ActivateTime { get; set; }

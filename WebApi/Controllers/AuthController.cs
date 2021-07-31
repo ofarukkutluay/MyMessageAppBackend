@@ -47,6 +47,11 @@ namespace WebApi.Controllers
             }
 
             var registerResult = _authService.Register(userForRegisterDto, userForRegisterDto.Password);
+            if (!registerResult.Success)
+            {
+                return BadRequest(registerResult.Message);
+            }
+
             var result = _authService.CreateAccessToken(registerResult.Data);
             if (result.Success)
             {

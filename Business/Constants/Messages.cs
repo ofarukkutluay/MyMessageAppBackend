@@ -26,5 +26,7 @@ namespace Business.Constants
         public static string AccessTokenCreated = "Geçerli Token oluşturuldu";
         public static string PasswordChanged = "Şifre Değiştirildi";
         public static string AccessTokenDontCreated = "Geçerli Token oluşturulamadı";
+        public static string IdNotFound = "Id girişi gereklidir";
+        public static string ListEmpty = "Liste boş. Data getirilemedi";
     }
 }

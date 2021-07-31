@@ -27,6 +27,7 @@ namespace Business.Concretes
             return new SuccessDataResult<List<Message>>(result);
         }
 
+        [SecuredOperation("admin,kullanici")]
         public IResult Add(Message entity)
         {
             entity.SendTime = DateTime.Now;
@@ -48,17 +49,19 @@ namespace Business.Concretes
             return new SuccessResult();
         }
 
+        [SecuredOperation("admin,kullanici")]
         public IResult Delete(Message entity)
         {
             _messageRepository.Delete(entity);
             return new SuccessResult();
         }
 
+        [SecuredOperation("admin,kullanici")]
         public IDataResult<List<Message>> GetBySenderAndReciverAll(string senderId, string reciverId)
         {
-            var result = _messageRepository.SearchFor(m => m.SenderUserId == senderId && m.ReciverUserId == reciverId)
+            var result = _messageRepository.SearchFor(m => (m.SenderUserId == senderId && m.ReciverUserId == reciverId) || (m.SenderUserId == reciverId && m.ReciverUserId == senderId))
                 .OrderByDescending(m => m.SendTime).ToList();
-            return new SuccessDataResult<List<Message>>(result,"Mesajlar tarih sıralamasına göre listelendi");
+            return new SuccessDataResult<List<Message>>(result, $"{senderId} ve {reciverId} arasıdaki mesajlar tarih sıralamasına göre listelendi");
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Core.Business
 {
     public interface IServiceRepository<T>
     {
+        //invocation ile gelen isimlendirmede hata çıkardığı ve her business module eklenemediği için bağlılık çıkarıldı
         IDataResult<List<T>> GetAll();
         IResult Add(T entity);
         IDataResult<T> GetById(string id);

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Business.Abstracts;
+using Business.BusinessAspects.Autofac;
 using Business.Constants;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Caching;
@@ -27,30 +28,34 @@ namespace Business.Concretes
             _userRepository = userRepository;
         }
         
+        [SecuredOperation("admin")]
         [CacheAspect]
-        [PerformanceAspect(1)]
+        [PerformanceAspect(2)]
         public IDataResult<List<User>> GetAll()
         {
             List<User> result = _userRepository.GetAll().ToList();
+            if (result.Count == 0)
+            {
+                return new ErrorDataResult<List<User>>(Messages.ListEmpty);
+            }
             return new SuccessDataResult<List<User>>(result, Messages.GetAll);
         }
 
-        
+        [TransactionScopeAspect]
         [ValidationAspect(typeof(UserValidator))]
         public IResult Add(User entity)
         {
             
             if ( GetByMail(entity.Email) == null)
             {
-                entity.CreateTime = DateTime.Now;
-                entity.Status = false;
                 _userRepository.Insert(entity);
                 return new SuccessResult(Messages.Add(entity.Email));
             }
 
-            return new ErrorResult();
+            return new ErrorResult(Messages.UserAlreadyExists);
 
         }
+
 
         [TransactionScopeAspect]
         public IDataResult<User> GetById(string id)
@@ -59,6 +64,7 @@ namespace Business.Concretes
             return new SuccessDataResult<User>(result, Messages.GetById(result.Email));
         }
 
+        [SecuredOperation("admin,kullanici")]
         [CacheRemoveAspect("IUserService.Get")]
         [ValidationAspect(typeof(UserValidator))]
         public IResult Update(User entity)
@@ -69,22 +75,26 @@ namespace Business.Concretes
                 return new SuccessResult(Messages.Update(entity.Id));
             }
 
-            return new ErrorResult("Güncelleme için id gereklidir!");
+            return new ErrorResult(Messages.IdNotFound);
         }
 
+        [SecuredOperation("admin")]
+        [CacheRemoveAspect("IUserService.Get")]
         public IResult Delete(User entity)
         {
             if (entity.Id != null)
             {
                 _userRepository.Delete(entity);
-                return new SuccessResult(Messages.Delete(entity.Email));
+                return new SuccessResult(Messages.Delete(entity.Id));
             }
 
-            return new ErrorResult("Kullanıcıyı silmek için id gereklidir");
+            return new ErrorResult(Messages.IdNotFound);
         }
 
+        [TransactionScopeAspect]
         public List<OperationClaim> GetClaims(User user)
         {
+            
             MongoDbUserOperationClaimDal userOperationClaimDal = new MongoDbUserOperationClaimDal();
             MongoDbOperationClaimDal operationClaimDal = new MongoDbOperationClaimDal();
             List<UserOperationClaim> userOperationClaims = userOperationClaimDal.SearchFor(uoc => uoc.UserId == user.Id);
@@ -93,7 +103,6 @@ namespace Business.Concretes
             {
                 operationClaims.AddRange(operationClaimDal.SearchFor(oc => oc.Id == uoc.OperationClaimId).ToList());
             }
-
             return operationClaims;
 
         }

@@ -24,4 +24,9 @@ namespace Core.Extensions
     {
         public IEnumerable<ValidationFailure> ValidationErrors { get; set; }
     }
+
+    public class SecuredOperationErrorDetails : ErrorDetails
+    {
+
+    }
 }

@@ -9,8 +9,13 @@ using Entities.Concretes;
 
 namespace Business.Abstracts
 {
-    public interface IMessageService : IServiceRepository<Message>
+    public interface IMessageService 
     {
+        IDataResult<List<Message>> GetAll();
+        IResult Add(Message entity);
+        IDataResult<Message> GetById(string id);
+        IResult Update(Message entity);
+        IResult Delete(Message entity);
         IDataResult<List<Message>> GetBySenderAndReciverAll(string senderId,string reciverId);
     }
 }

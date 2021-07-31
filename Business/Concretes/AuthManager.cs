@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Business.Abstracts;
 using Business.Constants;
+using Core.Aspects.Autofac.Caching;
 using Core.Entities.Concretes;
 using Core.Utilities.Results;
 using Core.Utilities.Security.Hashing;
@@ -24,6 +25,7 @@ namespace Business.Concretes
             _tokenHelper = tokenHelper;
         }
 
+        [CacheRemoveAspect("IUserService.Get")]
         public IDataResult<User> Register(UserForRegisterDto userForRegisterDto, string password)
         {
             byte[] passwordHash, passwordSalt;
@@ -33,11 +35,18 @@ namespace Business.Concretes
                 Email = userForRegisterDto.Email,
                 FirstName = userForRegisterDto.FirstName,
                 LastName = userForRegisterDto.LastName,
+                NationaltyId = userForRegisterDto.NationaltyId,
+                DateOfBirth = userForRegisterDto.DateOfBirth,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
             };
-            _userService.Add(user);
-            return new SuccessDataResult<User>(user, Messages.UserRegistered);
+            var result = _userService.Add(user);
+            if (result.Success)
+            {
+                return new SuccessDataResult<User>(user, Messages.UserRegistered);
+            }
+
+            return new ErrorDataResult<User>(result.Message);
         }
 
         public IDataResult<User> Login(UserForLoginDto userForLoginDto)
@@ -56,6 +65,7 @@ namespace Business.Concretes
             return new SuccessDataResult<User>(userToCheck, Messages.SuccessfulLogin);
         }
 
+        [CacheRemoveAspect("IUserService.Get")]
         public IDataResult<User> PasswordUpdate(UserForPasswordUpdateDto userForPasswordUpdateDto, string newPassword)
         {
             var userToCheck = _userService.GetByMail(userForPasswordUpdateDto.Email);
