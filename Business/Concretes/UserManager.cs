@@ -3,37 +3,44 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Autofac;
 using Business.Abstracts;
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
+using Business.DependencyResolvers.Autofac;
 using Business.ValidationRules.FluentValidation;
 using Core.Aspects.Autofac.Caching;
 using Core.Aspects.Autofac.Performance;
 using Core.Aspects.Autofac.Transaction;
 using Core.Aspects.Autofac.Validation;
 using Core.Entities.Concretes;
+using Core.Utilities.IoC;
 using Core.Utilities.Results;
 using DataAccess.Abstracts;
-using DataAccess.Concretes;
-using FluentValidation;
+using Entities.Concretes;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace Business.Concretes
 {
     public class UserManager : IUserService
     {
         private IUserRepository _userRepository;
+        private IUserOperationClaimService _userOperationClaimService;
+        private IOperationClaimService _operationClaimService;
 
-        public UserManager(IUserRepository userRepository)
+        public UserManager(IUserRepository userRepository,IUserOperationClaimService userOperationClaimService,IOperationClaimService operationClaimService)
         {
             _userRepository = userRepository;
+            _userOperationClaimService = userOperationClaimService;
+            _operationClaimService = operationClaimService;
         }
-        
+
         [SecuredOperation("admin")]
-        [CacheAspect]
         [PerformanceAspect(2)]
         public IDataResult<List<User>> GetAll()
         {
-            List<User> result = _userRepository.GetAll().ToList();
+            List<User> result = _userRepository.GetAll();
             if (result.Count == 0)
             {
                 return new ErrorDataResult<List<User>>(Messages.ListEmpty);
@@ -41,12 +48,13 @@ namespace Business.Concretes
             return new SuccessDataResult<List<User>>(result, Messages.GetAll);
         }
 
+        [SecuredOperation("admin")]
         [TransactionScopeAspect]
         [ValidationAspect(typeof(UserValidator))]
         public IResult Add(User entity)
         {
-            
-            if ( GetByMail(entity.Email) == null)
+
+            if (GetByMail(entity.Email) == null && GetByMobileNumber(entity.MobileNumber)==null)
             {
                 _userRepository.Insert(entity);
                 return new SuccessResult(Messages.Add(entity.Email));
@@ -56,7 +64,7 @@ namespace Business.Concretes
 
         }
 
-
+        [SecuredOperation("admin")]
         [TransactionScopeAspect]
         public IDataResult<User> GetById(string id)
         {
@@ -65,12 +73,39 @@ namespace Business.Concretes
         }
 
         [SecuredOperation("admin,kullanici")]
-        [CacheRemoveAspect("IUserService.Get")]
+        public IDataResult<Person> GetPersonByUserId(string userId)
+        {
+            var result = _userRepository.GetPersonByUserId(userId);
+            return new SuccessDataResult<Person>(result, Messages.GetById(result.Email));
+        }
+
+        [SecuredOperation("admin,kullanici")]
+        public IDataResult<Person> GetPersonByEmail(string email)
+        {
+            var result = _userRepository.GetPersonByEmail(email);
+            return new SuccessDataResult<Person>(result, Messages.GetById(result.Id));
+        }
+
+        [SecuredOperation("admin,kullanici")]
+        public IDataResult<Person> GetPersonByMobileNumber(string mobileNumber)
+        {
+            var result = _userRepository.GetPersonByMobileNumber(mobileNumber);
+            return new SuccessDataResult<Person>(result, Messages.GetById(result.Id));
+        }
+
+        [SecuredOperation("admin")]
         [ValidationAspect(typeof(UserValidator))]
         public IResult Update(User entity)
         {
             if (entity.Id != null)
             {
+                if (entity.Email != null || entity.MobileNumber != null)
+                {
+                    if (GetByMail(entity.Email) != null || GetByMobileNumber(entity.MobileNumber) != null)
+                    {
+                        return new ErrorResult(Messages.UserAlreadyExists);
+                    }
+                }
                 _userRepository.Update(entity);
                 return new SuccessResult(Messages.Update(entity.Id));
             }
@@ -78,8 +113,40 @@ namespace Business.Concretes
             return new ErrorResult(Messages.IdNotFound);
         }
 
+        [SecuredOperation("admin,kullanici")]
+        public IResult UpdatePerson(Person entity)
+        {
+            if (entity.Id != null)
+            {
+                if (entity.Email != null || entity.MobileNumber != null)
+                {
+                    if (GetByMail(entity.Email) != null || GetByMobileNumber(entity.MobileNumber) != null)
+                    {
+                        return new ErrorResult(Messages.UserAlreadyExists);
+                    }
+                }
+
+                _userRepository.Update((User)entity);
+                return new SuccessResult(Messages.Update(entity.Id));
+            }
+
+            return new ErrorResult(Messages.IdNotFound);
+        }
+
         [SecuredOperation("admin")]
-        [CacheRemoveAspect("IUserService.Get")]
+        public IResult ActivateUser(string id)
+        {
+            User user = new User()
+            {
+                Id = id,
+                Status = true,
+                ActivateTime = DateTime.Now
+            };
+            Update(user);
+            return new SuccessResult(Messages.Update(id));
+        }
+
+        [SecuredOperation("admin")]
         public IResult Delete(User entity)
         {
             if (entity.Id != null)
@@ -91,18 +158,18 @@ namespace Business.Concretes
             return new ErrorResult(Messages.IdNotFound);
         }
 
+        
         [TransactionScopeAspect]
         public List<OperationClaim> GetClaims(User user)
         {
             
-            MongoDbUserOperationClaimDal userOperationClaimDal = new MongoDbUserOperationClaimDal();
-            MongoDbOperationClaimDal operationClaimDal = new MongoDbOperationClaimDal();
-            List<UserOperationClaim> userOperationClaims = userOperationClaimDal.SearchFor(uoc => uoc.UserId == user.Id);
+            List<UserOperationClaim> userOperationClaims = _userOperationClaimService?.ClaimForGetByUserId(user.Id);
             List<OperationClaim> operationClaims = new List<OperationClaim>();
-            foreach (var uoc in userOperationClaims)
+            foreach (UserOperationClaim userOperationClaim in userOperationClaims)
             {
-                operationClaims.AddRange(operationClaimDal.SearchFor(oc => oc.Id == uoc.OperationClaimId).ToList());
+                operationClaims.Add(_operationClaimService.ClaimForGetById(userOperationClaim.OperationClaimId));
             }
+
             return operationClaims;
 
         }
@@ -112,5 +179,13 @@ namespace Business.Concretes
             var result = _userRepository.SearchFor(e => e.Email == email).FirstOrDefault();
             return result;
         }
+
+        public User GetByMobileNumber(string mobileNumber)
+        {
+            var result = _userRepository.SearchFor(e => e.MobileNumber == mobileNumber).FirstOrDefault();
+            return result;
+        }
+
+
     }
 }

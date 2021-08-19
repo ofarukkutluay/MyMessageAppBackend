@@ -10,5 +10,8 @@ namespace DataAccess.Abstracts
 {
     public interface IUserRepository : IMongoDbRepositoryBase<User>
     {
+        Person GetPersonByUserId(string userId);
+        Person GetPersonByEmail(string email);
+        Person GetPersonByMobileNumber(string mobileNumber);
     }
 }

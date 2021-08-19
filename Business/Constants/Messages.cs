@@ -9,10 +9,7 @@ namespace Business.Constants
 {
     public static class Messages
     {
-        public static string Add(string entityName)
-        {
-            return entityName + " eklendi";
-        }
+        public static string Add(string entityName)=> entityName + " eklendi";
         public static string GetAll = "Tüm data getirildi";
         public static string GetById(string entityName) => entityName + " getirildi";
         public static string Update(string entityName) => entityName + " güncellendi";
@@ -28,5 +25,6 @@ namespace Business.Constants
         public static string AccessTokenDontCreated = "Geçerli Token oluşturulamadı";
         public static string IdNotFound = "Id girişi gereklidir";
         public static string ListEmpty = "Liste boş. Data getirilemedi";
+        public static string StatusFalseUser = "Aktif olmayan kullanıcı mesaj gönderemez";
     }
 }

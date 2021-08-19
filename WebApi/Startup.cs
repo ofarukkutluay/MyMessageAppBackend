@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Business.DependencyResolvers;
 using Core.DependencyResolvers;
 using Core.Entities.Concretes;
 using Core.Extensions;
@@ -92,7 +93,8 @@ namespace WebApi
 
             services.AddDependencyResolvers(new ICoreModule[]
             {
-                new CoreModule()
+                new CoreModule(),
+                new BusinessModule()
             });
 
 

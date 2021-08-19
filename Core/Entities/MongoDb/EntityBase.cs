@@ -7,7 +7,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Core.Entities.MongoDb
 {
-    public class EntityBase
+    public abstract class EntityBase
     {
         [BsonId]
         public string Id { get; set; }

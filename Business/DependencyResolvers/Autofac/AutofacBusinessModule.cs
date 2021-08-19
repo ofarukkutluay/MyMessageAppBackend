@@ -23,6 +23,11 @@ namespace Business.DependencyResolvers.Autofac
             builder.RegisterType<UserManager>().As<IUserService>().SingleInstance();
             builder.RegisterType<MongoDbMessageDal>().As<IMessageRepository>().SingleInstance();
             builder.RegisterType<MessageManager>().As<IMessageService>().SingleInstance();
+            builder.RegisterType<OperationClaimManager>().As<IOperationClaimService>();
+            builder.RegisterType<MongoDbOperationClaimDal>().As<IOperationClaimRepository>();
+            builder.RegisterType<UserOperationClaimManager>().As<IUserOperationClaimService>();
+            builder.RegisterType<MongoDbUserOperationClaimDal>().As<IUserOperationClaimRepository>();
+
             builder.RegisterType<AuthManager>().As<IAuthService>();
             builder.RegisterType<JwtHelper>().As<ITokenHelper>();
 

@@ -34,5 +34,20 @@ namespace Core.Utilities.Security.Hashing
 
             return true;
         }
+        public static void CreateTextHash(string text, out byte[] textHash, out byte[] textSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                textSalt = hmac.Key;
+                textHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(text));
+            }
+
+        }
+
+        public static string DecodeTextHash(byte[] textHash, byte[] textSalt)
+        {
+            //TODO
+            return null;
+        }
     }
 }

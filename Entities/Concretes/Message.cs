@@ -14,6 +14,8 @@ namespace Entities.Concretes
         public string SenderUserId { get; set; }
         public string ReciverUserId { get; set; }
         public string Text { get; set; }
+        public byte[] TextHash { get; set; }
+        public byte[] TextSalt { get; set; }
         public DateTime? SendTime { get; set; }
         public DateTime? ReadTime { get; set; }
     }
