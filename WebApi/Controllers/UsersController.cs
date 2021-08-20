@@ -20,16 +20,16 @@ namespace WebApi.Controllers
             _userService = userService;
         }
 
-        [HttpPost]
-        public IActionResult Add(User user)
-        {
-            var result = _userService.Add(user);
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-            return BadRequest(result);
-        }
+        //[HttpPost]
+        //public IActionResult Add(User user)
+        //{
+        //    var result = _userService.Add(user);
+        //    if (result.Success)
+        //    {
+        //        return Ok(result);
+        //    }
+        //    return BadRequest(result);
+        //}
 
         [HttpGet]
         public IActionResult GetAll()
@@ -130,9 +130,9 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult ActiveUser(string id)
+        public IActionResult ActiveUser(string id, bool status)
         {
-            var result = _userService.ActivateUser(id);
+            var result = _userService.ActivateUser(id,status);
             if (result.Success)
             {
                 return Ok(result);

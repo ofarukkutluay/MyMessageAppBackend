@@ -19,7 +19,7 @@ namespace Business.Abstracts
         IDataResult<Person> GetPersonByMobileNumber(string mobileNumber);
         IResult Update(User entity);
         IResult UpdatePerson(Person entity);
-        IResult ActivateUser(string id);
+        IResult ActivateUser(string id, bool status);
         IResult Delete(User entity);
         List<OperationClaim> GetClaims(User user);
         User GetByMail(string email);

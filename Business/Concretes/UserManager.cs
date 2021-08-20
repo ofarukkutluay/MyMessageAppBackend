@@ -26,14 +26,14 @@ namespace Business.Concretes
     public class UserManager : IUserService
     {
         private IUserRepository _userRepository;
-        private IUserOperationClaimService _userOperationClaimService;
-        private IOperationClaimService _operationClaimService;
+        private IUserOperationClaimRepository _userOperationClaimRepository;
+        private IOperationClaimRepository _operationClaimRepository;
 
-        public UserManager(IUserRepository userRepository,IUserOperationClaimService userOperationClaimService,IOperationClaimService operationClaimService)
+        public UserManager(IUserRepository userRepository,IUserOperationClaimRepository userOperationClaimRepository,IOperationClaimRepository operationClaimRepository)
         {
             _userRepository = userRepository;
-            _userOperationClaimService = userOperationClaimService;
-            _operationClaimService = operationClaimService;
+            _userOperationClaimRepository = userOperationClaimRepository;
+            _operationClaimRepository = operationClaimRepository;
         }
 
         [SecuredOperation("admin")]
@@ -48,18 +48,23 @@ namespace Business.Concretes
             return new SuccessDataResult<List<User>>(result, Messages.GetAll);
         }
 
-        [SecuredOperation("admin")]
+        //[SecuredOperation("admin")]
         [TransactionScopeAspect]
         [ValidationAspect(typeof(UserValidator))]
         public IResult Add(User entity)
         {
-
+            
             if (GetByMail(entity.Email) == null && GetByMobileNumber(entity.MobileNumber)==null)
             {
                 _userRepository.Insert(entity);
+                UserOperationClaim userOperationClaim = new UserOperationClaim()
+                {
+                    OperationClaimId = "6105b352aa76461dcec2f8be",
+                    UserId = GetByMail(entity.Email).Id
+                };
+                _userOperationClaimRepository.Insert(userOperationClaim);
                 return new SuccessResult(Messages.Add(entity.Email));
             }
-
             return new ErrorResult(Messages.UserAlreadyExists);
 
         }
@@ -72,21 +77,21 @@ namespace Business.Concretes
             return new SuccessDataResult<User>(result, Messages.GetById(result.Email));
         }
 
-        [SecuredOperation("admin,kullanici")]
+        [SecuredOperation("admin,user")]
         public IDataResult<Person> GetPersonByUserId(string userId)
         {
             var result = _userRepository.GetPersonByUserId(userId);
             return new SuccessDataResult<Person>(result, Messages.GetById(result.Email));
         }
 
-        [SecuredOperation("admin,kullanici")]
+        [SecuredOperation("admin,user")]
         public IDataResult<Person> GetPersonByEmail(string email)
         {
             var result = _userRepository.GetPersonByEmail(email);
             return new SuccessDataResult<Person>(result, Messages.GetById(result.Id));
         }
 
-        [SecuredOperation("admin,kullanici")]
+        [SecuredOperation("admin,user")]
         public IDataResult<Person> GetPersonByMobileNumber(string mobileNumber)
         {
             var result = _userRepository.GetPersonByMobileNumber(mobileNumber);
@@ -113,7 +118,7 @@ namespace Business.Concretes
             return new ErrorResult(Messages.IdNotFound);
         }
 
-        [SecuredOperation("admin,kullanici")]
+        [SecuredOperation("admin,user")]
         public IResult UpdatePerson(Person entity)
         {
             if (entity.Id != null)
@@ -134,14 +139,21 @@ namespace Business.Concretes
         }
 
         [SecuredOperation("admin")]
-        public IResult ActivateUser(string id)
+        public IResult ActivateUser(string id,bool status)
         {
             User user = new User()
             {
                 Id = id,
-                Status = true,
-                ActivateTime = DateTime.Now
+                Status = status,
             };
+            if (status)
+            {
+                user.ActivateTime = DateTime.Now;
+            }
+            else
+            {
+                user.DeactiveTime = DateTime.Now;
+            }
             Update(user);
             return new SuccessResult(Messages.Update(id));
         }
@@ -163,11 +175,11 @@ namespace Business.Concretes
         public List<OperationClaim> GetClaims(User user)
         {
             
-            List<UserOperationClaim> userOperationClaims = _userOperationClaimService?.ClaimForGetByUserId(user.Id);
+            List<UserOperationClaim> userOperationClaims = _userOperationClaimRepository.SearchFor(uo =>uo.UserId == user.Id);
             List<OperationClaim> operationClaims = new List<OperationClaim>();
             foreach (UserOperationClaim userOperationClaim in userOperationClaims)
             {
-                operationClaims.Add(_operationClaimService.ClaimForGetById(userOperationClaim.OperationClaimId));
+                operationClaims.Add(_operationClaimRepository.GetById(userOperationClaim.OperationClaimId));
             }
 
             return operationClaims;

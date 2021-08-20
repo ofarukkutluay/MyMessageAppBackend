@@ -14,6 +14,7 @@ namespace Entities.Dtos
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public long NationaltyId { get; set; }
+        public string MobileNumber { get; set; }
         public DateTime? DateOfBirth { get; set; }
     }
 }

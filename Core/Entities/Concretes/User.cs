@@ -15,7 +15,7 @@ namespace Core.Entities.Concretes
         public User()
         {
             CreateTime = DateTime.Now;
-            Status = false;
+            Status = true;
         }
         //public string FirstName { get; set; }
         //public string LastName { get; set; }
@@ -26,6 +26,7 @@ namespace Core.Entities.Concretes
         //public bool Status { get; set; }
         public DateTime? CreateTime { get; set; }
         public DateTime? ActivateTime { get; set; }
+        public DateTime? DeactiveTime { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
     }

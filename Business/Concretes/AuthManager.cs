@@ -36,6 +36,7 @@ namespace Business.Concretes
                 FirstName = userForRegisterDto.FirstName,
                 LastName = userForRegisterDto.LastName,
                 NationaltyId = userForRegisterDto.NationaltyId,
+                MobileNumber = userForRegisterDto.MobileNumber,
                 DateOfBirth = userForRegisterDto.DateOfBirth,
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,

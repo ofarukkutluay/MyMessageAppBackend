@@ -37,7 +37,7 @@ namespace Business.Concretes
             return new SuccessDataResult<List<Message>>(result,Messages.GetAll);
         }
 
-        [SecuredOperation("admin,kullanici")]
+        [SecuredOperation("admin,user")]
         [CacheRemoveAspect("IMessageService.Get")]
         [TransactionScopeAspect]
         public IResult Add(Message entity)
@@ -80,7 +80,7 @@ namespace Business.Concretes
             return new SuccessResult(Messages.Update(entity.Id));
         }
 
-        [SecuredOperation("admin,kullanici")]
+        [SecuredOperation("admin,user")]
         [CacheRemoveAspect("IMessageService.Get")]
         public IResult Delete(Message entity)
         {
@@ -92,7 +92,7 @@ namespace Business.Concretes
             return new SuccessResult(Messages.Update(entity.Id));
         }
 
-        [SecuredOperation("admin,kullanici")]
+        [SecuredOperation("admin,user")]
         [PerformanceAspect(2)]
         [CacheAspect]
         public IDataResult<List<Message>> GetBySenderAndReciverAll(string senderId, string reciverId)
