@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Core.DataAccess.MongoDb;
+using DataAccess.Abstracts;
+using Entities.Concretes;
+
+namespace DataAccess.Concretes
+{
+    public class MongoDbClientUserDal : MongoDbRepositoryBase<ClientUser>, IClientUserRepository
+    {
+    }
+}

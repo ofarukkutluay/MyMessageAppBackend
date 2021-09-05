@@ -12,7 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Business.Concretes;
 using Business.DependencyResolvers;
+using Business.Hubs.Chat;
 using Core.DependencyResolvers;
 using Core.Entities.Concretes;
 using Core.Extensions;
@@ -97,6 +99,7 @@ namespace WebApi
                 new BusinessModule()
             });
 
+            services.AddSignalR();
 
         }
 
@@ -147,6 +150,7 @@ namespace WebApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chatHub");
             });
         }
     }

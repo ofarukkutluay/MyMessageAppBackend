@@ -19,14 +19,15 @@ namespace Business.DependencyResolvers.Autofac
     {
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterType<MongoDbUserDal>().As<IUserRepository>().SingleInstance();
-            builder.RegisterType<UserManager>().As<IUserService>().SingleInstance();
-            builder.RegisterType<MongoDbMessageDal>().As<IMessageRepository>().SingleInstance();
-            builder.RegisterType<MessageManager>().As<IMessageService>().SingleInstance();
+            builder.RegisterType<MongoDbUserDal>().As<IUserRepository>();
+            builder.RegisterType<UserManager>().As<IUserService>();
+            builder.RegisterType<MongoDbMessageDal>().As<IMessageRepository>();
+            builder.RegisterType<MessageManager>().As<IMessageService>();
             builder.RegisterType<OperationClaimManager>().As<IOperationClaimService>();
             builder.RegisterType<MongoDbOperationClaimDal>().As<IOperationClaimRepository>();
             builder.RegisterType<UserOperationClaimManager>().As<IUserOperationClaimService>();
             builder.RegisterType<MongoDbUserOperationClaimDal>().As<IUserOperationClaimRepository>();
+            builder.RegisterType<MongoDbClientUserDal>().As<IClientUserRepository>();
 
             builder.RegisterType<AuthManager>().As<IAuthService>();
             builder.RegisterType<JwtHelper>().As<ITokenHelper>();

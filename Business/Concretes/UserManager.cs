@@ -84,7 +84,7 @@ namespace Business.Concretes
             return new SuccessDataResult<Person>(result, Messages.GetById(result.Email));
         }
 
-        [SecuredOperation("admin,user")]
+        //[SecuredOperation("admin,user")]
         public IDataResult<Person> GetPersonByEmail(string email)
         {
             var result = _userRepository.GetPersonByEmail(email);

@@ -21,12 +21,12 @@ namespace Business.Concretes
     public class MessageManager : IMessageService
     {
         private IMessageRepository _messageRepository;
-        private IUserService _userService;
+        private IUserRepository _userRepository;
 
-        public MessageManager(IMessageRepository messageRepository,IUserService userService)
+        public MessageManager(IMessageRepository messageRepository, IUserRepository userRepository)
         {
             _messageRepository = messageRepository;
-            _userService = userService;
+            _userRepository = userRepository;
         }
 
         [SecuredOperation("admin")]
@@ -37,12 +37,12 @@ namespace Business.Concretes
             return new SuccessDataResult<List<Message>>(result,Messages.GetAll);
         }
 
-        [SecuredOperation("admin,user")]
+        //[SecuredOperation("admin,user")]
         [CacheRemoveAspect("IMessageService.Get")]
         [TransactionScopeAspect]
         public IResult Add(Message entity)
         {
-            if (!_userService.GetPersonByUserId(entity.SenderUserId).Data.Status)
+            if (!_userRepository.GetPersonByUserId(entity.ReciverUserId).Status)
             {
                 return new ErrorResult(Messages.StatusFalseUser);
             }
@@ -98,7 +98,7 @@ namespace Business.Concretes
         public IDataResult<List<Message>> GetBySenderAndReciverAll(string senderId, string reciverId)
         {
             var result = _messageRepository.SearchFor(m => (m.SenderUserId == senderId && m.ReciverUserId == reciverId) || (m.SenderUserId == reciverId && m.ReciverUserId == senderId))
-                .OrderByDescending(m => m.SendTime).ToList();
+                .OrderBy(m => m.SendTime).ToList();
             return new SuccessDataResult<List<Message>>(result, $"{senderId} ve {reciverId} arasıdaki mesajlar tarih sıralamasına göre listelendi");
         }
     }

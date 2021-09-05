@@ -29,20 +29,20 @@ namespace WebApi
                     builder.RegisterModule(new AutofacBusinessModule());
                 }).ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>(); 
+                    webBuilder.UseStartup<Startup>();
 
                 });
     }
 }
-        /*DryIoc için
-         
-        private static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new DryIocServiceProviderFactory())
-                .ConfigureContainer<IContainer>(
-                    (hostBuilderContext ,container) =>
-                    {
-                        DryIocBusinessModule.Register(container);
-                    }).ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });*/
+/*DryIoc için
+
+private static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args).UseServiceProviderFactory(new DryIocServiceProviderFactory())
+        .ConfigureContainer<IContainer>(
+            (hostBuilderContext ,container) =>
+            {
+                DryIocBusinessModule.Register(container);
+            }).ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        });*/
