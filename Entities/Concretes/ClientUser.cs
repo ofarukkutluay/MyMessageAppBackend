@@ -11,6 +11,7 @@ namespace Entities.Concretes
     public class ClientUser : EntityBase,IEntity
     {
         public string ClientId { get; set; }
+        public string UserId { get; set; }
         public string UserEmail { get; set; }
 
     }

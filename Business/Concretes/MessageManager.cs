@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Business.Abstracts;
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
+using Business.Hubs.Chat;
 using Core.Aspects.Autofac.Caching;
 using Core.Aspects.Autofac.Performance;
 using Core.Aspects.Autofac.Transaction;
@@ -14,19 +15,24 @@ using Core.Utilities.Results;
 using Core.Utilities.Security.Hashing;
 using DataAccess.Abstracts;
 using Entities.Concretes;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Business.Concretes
 {
     public class MessageManager : IMessageService
     {
-        private IMessageRepository _messageRepository;
-        private IUserRepository _userRepository;
+        private readonly IMessageRepository _messageRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IHubContext<ChatHub, IChatHubClient> _hubContext;
+        private readonly IClientUserRepository _clientUserRepository;
 
-        public MessageManager(IMessageRepository messageRepository, IUserRepository userRepository)
+        public MessageManager(IMessageRepository messageRepository, IUserRepository userRepository, IHubContext<ChatHub, IChatHubClient> hubContext, IClientUserRepository clientUserRepository)
         {
             _messageRepository = messageRepository;
             _userRepository = userRepository;
+            _hubContext = hubContext;
+            _clientUserRepository = clientUserRepository;
         }
 
         [SecuredOperation("admin")]
@@ -34,20 +40,23 @@ namespace Business.Concretes
         public IDataResult<List<Message>> GetAll()
         {
             var result = _messageRepository.GetAll();
-            return new SuccessDataResult<List<Message>>(result,Messages.GetAll);
+            return new SuccessDataResult<List<Message>>(result, Messages.GetAll);
         }
 
-        //[SecuredOperation("admin,user")]
+        [SecuredOperation("admin,user")]
         [CacheRemoveAspect("IMessageService.Get")]
         [TransactionScopeAspect]
         public IResult Add(Message entity)
         {
-            if (!_userRepository.GetPersonByUserId(entity.ReciverUserId).Status)
+            var receiverPerson = _userRepository.GetPersonByUserId(entity.ReciverUserId);
+            if (!receiverPerson.Status)
             {
                 return new ErrorResult(Messages.StatusFalseUser);
             }
+
             byte[] textHash, textSalt;
-            HashingHelper.CreateTextHash(entity.Text,out textHash,out textSalt);
+            HashingHelper.CreateTextHash(entity.Text, out textHash, out textSalt);
+
             Message message = new Message()
             {
                 Text = entity.Text,
@@ -57,7 +66,22 @@ namespace Business.Concretes
                 ReciverUserId = entity.ReciverUserId,
                 SendTime = DateTime.Now
             };
+
             _messageRepository.Insert(message);
+
+            ClientUser receiverClientUser =
+                _clientUserRepository.SearchFor(cu => cu.UserId == entity.ReciverUserId).FirstOrDefault();
+            ClientUser senderClientUser =
+                _clientUserRepository.SearchFor(cu => cu.UserId == entity.SenderUserId).FirstOrDefault();
+            if (receiverClientUser != null)
+                _hubContext.Clients
+                    .Client(receiverClientUser.ClientId)
+                    .ReceiveMessage(entity.SenderUserId, entity.Text);
+            if (senderClientUser != null)
+                _hubContext.Clients
+                    .Client(senderClientUser.ClientId)
+                    .ReceiveMessage(entity.SenderUserId, entity.Text);
+
             return new SuccessResult(Messages.Add(entity.Id));
         }
 
@@ -65,14 +89,14 @@ namespace Business.Concretes
         public IDataResult<Message> GetById(string id)
         {
             var result = _messageRepository.GetById(id);
-            return new SuccessDataResult<Message>(result,Messages.GetById(id));
+            return new SuccessDataResult<Message>(result, Messages.GetById(id));
         }
 
         [SecuredOperation("admin")]
         [CacheRemoveAspect("IMessageService.Get")]
         public IResult Update(Message entity)
         {
-            if (entity.Id== null)
+            if (entity.Id == null)
             {
                 return new ErrorResult(Messages.IdNotFound);
             }
