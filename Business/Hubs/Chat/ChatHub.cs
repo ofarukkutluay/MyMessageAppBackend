@@ -59,12 +59,22 @@ namespace Business.Hubs.Chat
 
         public async Task LoginUser(Person person)
         {
-            _clientUserRepository.Insert(new ClientUser()
+            var clientUser = _clientUserRepository.SearchFor(cu => cu.UserId == person.Id).FirstOrDefault();
+            if (clientUser != null)
             {
-                ClientId = Context.ConnectionId,
-                UserId = person.Id,
-                UserEmail = person.Email
-            });
+                clientUser.ClientId = Context.ConnectionId;
+                _clientUserRepository.Update(clientUser);
+                await Clients.Others.UserJoined($"{person.Email} tekrar giriş yaptı");
+            }
+            else
+            {
+                _clientUserRepository.Insert(new ClientUser()
+                {
+                    ClientId = Context.ConnectionId,
+                    UserId = person.Id,
+                    UserEmail = person.Email
+                });
+            }
             await Clients.Others.UserJoined($"{person.Email} giriş yaptı");
 
         }
