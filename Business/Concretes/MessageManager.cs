@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Business.Abstracts;
 using Business.BusinessAspects.Autofac;
 using Business.Constants;
-using Business.Hubs.Chat;
 using Core.Aspects.Autofac.Caching;
 using Core.Aspects.Autofac.Performance;
 using Core.Aspects.Autofac.Transaction;
@@ -15,6 +14,7 @@ using Core.Utilities.Results;
 using Core.Utilities.Security.Hashing;
 using DataAccess.Abstracts;
 using Entities.Concretes;
+using Hubs.Chat;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 
